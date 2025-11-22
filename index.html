@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MovieLife - Your Hybrid Entertainment Platform</title>
+    <style>
+        :root {
+            --netflix-red: #E50914;
+            --netflix-black: #141414;
+            --netflix-dark: #181818;
+            --netflix-gray: #2F2F2F;
+            --netflix-light: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--netflix-black);
+            color: var(--netflix-light);
+            font-family: 'Arial', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%);
+            padding: 20px 50px;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s;
+        }
+
+        .navbar.scrolled {
+            background: var(--netflix-black);
+        }
+
+        .nav-logo h1 {
+            color: var(--netflix-red);
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-link {
+            color: var(--netflix-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover {
+            color: var(--netflix-red);
+        }
+
+        /* Side Navigation */
+        .side-nav {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            width: 80px;
+            background: var(--netflix-dark);
+            padding-top: 80px;
+            z-index: 999;
+            transition: width 0.3s;
+        }
+
+        .side-nav:hover {
+            width: 200px;
+        }
+
+        .side-nav-content {
+            padding: 20px 0;
+        }
+
+        .side-nav-item {
+            display: flex;
+            align-items: center;
+            color: var(--netflix-light);
+            text-decoration: none;
+            padding: 15px 20px;
+            transition: background 0.3s;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .side-nav-item:hover,
+        .side-nav-item.active {
+            background: var(--netflix-gray);
+        }
+
+        .side-nav-item span {
+            margin-left: 15px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .side-nav:hover .side-nav-item span {
+            opacity: 1;
+        }
+
+        /* Hero Banner */
+        .hero-banner {
+            height: 80vh;
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), #333;
+            display: flex;
+            align-items: center;
+            padding-left: 150px;
+            margin-top: 60px;
+        }
+
+        .hero-content h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .hero-content p {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            color: #ccc;
+        }
+
+        /* Slider Sections */
+        .slider-section {
+            padding: 40px 50px 40px 130px;
+        }
+
+        .slider-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--netflix-light);
+        }
+
+        .slider-container {
+            position: relative;
+        }
+
+        .slider {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            padding: 10px 0;
+            scrollbar-width: none;
+        }
+
+        .slider::-webkit-scrollbar {
+            display: none;
+        }
+
+        .slider-item {
+            min-width: 300px;
+            height: 169px;
+            background: var(--netflix-gray);
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+
+        .slider-item:hover {
+            transform: scale(1.05);
+        }
+
+        .slider-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .item-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .slider-item:hover .item-overlay {
+            opacity: 1;
+        }
+
+        /* Hidden Admin Access */
+        .hidden-admin {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background: var(--netflix-red);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            opacity: 0.3;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+
+        .hidden-admin:hover {
+            opacity: 1;
+        }
+
+        /* Admin Login Modal */
+        .admin-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .admin-login-box {
+            background: var(--netflix-dark);
+            padding: 40px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .admin-logo {
+            color: var(--netflix-red);
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .admin-input {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            background: var(--netflix-gray);
+            border: 1px solid #444;
+            border-radius: 5px;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .admin-btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--netflix-red);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .close-admin {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-logo">
+            <h1>MovieLife</h1>
+        </div>
+        <div class="nav-menu">
+            <a href="#movies" class="nav-link">Movies</a>
+            <a href="#anime" class="nav-link">Anime</a>
+            <a href="#tv-shows" class="nav-link">TV Shows</a>
+        </div>
+    </nav>
+
+    <!-- Side Navigation -->
+    <div class="side-nav">
+        <div class="side-nav-content">
+            <a href="#home" class="side-nav-item active">
+                🏠 <span>Home</span>
+            </a>
+            <a href="#movies" class="side-nav-item">
+                🎬 <span>Movies</span>
+            </a>
+            <a href="#anime" class="side-nav-item">
+                🎌 <span>Anime</span>
+            </a>
+            <a href="#tv-shows" class="side-nav-item">
+                📺 <span>TV Shows</span>
+            </a>
+            <a href="#my-list" class="side-nav-item">
+                ⭐ <span>My List</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Hero Banner -->
+    <section class="hero-banner">
+        <div class="hero-content">
+            <h1>Unlimited Entertainment</h1>
+            <p>Movies, Anime, TV Shows - All in One Place</p>
+        </div>
+    </section>
+
+    <!-- Content Sliders -->
+    <section class="slider-section">
+        <h2 class="slider-title">Popular Movies</h2>
+        <div class="slider-container">
+            <div class="slider" id="moviesSlider">
+                <div class="slider-item">
+                    <div style="background:#333;height:100%;display:flex;align-items:center;justify-content:center;color:#ccc;">
+                        Movie Poster 1
+                    </div>
+                    <div class="item-overlay">
+                        <h3>Sample Movie 1</h3>
+                        <button style="background:var(--netflix-red);color:white;border:none;padding:5px 10px;border-radius:3px;cursor:pointer;">
+                            Watch Now
+                        </button>
+                    </div>
+                </div>
+                <div class="slider-item">
+                    <div style="background:#333;height:100%;display:flex;align-items:center;justify-content:center;color:#ccc;">
+                        Movie Poster 2
+                    </div>
+                    <div class="item-overlay">
+                        <h3>Sample Movie 2</h3>
+                        <button style="background:var(--netflix-red);color:white;border:none;padding:5px 10px;border-radius:3px;cursor:pointer;">
+                            Watch Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="slider-section">
+        <h2 class="slider-title">Popular Anime</h2>
+        <div class="slider-container">
+            <div class="slider" id="animeSlider">
+                <div class="slider-item">
+                    <div style="background:#333;height:100%;display:flex;align-items:center;justify-content:center;color:#ccc;">
+                        Anime Poster 1
+                    </div>
+                    <div class="item-overlay">
+                        <h3>Sample Anime 1</h3>
+                        <button style="background:var(--netflix-red);color:white;border:none;padding:5px 10px;border-radius:3px;cursor:pointer;">
+                            Watch Now
+                        </button>
+                    </div>
+                </div>
+                <div class="slider-item">
+                    <div style="background:#333;height:100%;display:flex;align-items:center;justify-content:center;color:#ccc;">
+                        Anime Poster 2
+                    </div>
+                    <div class="item-overlay">
+                        <h3>Sample Anime 2</h3>
+                        <button style="background:var(--netflix-red);color:white;border:none;padding:5px 10px;border-radius:3px;cursor:pointer;">
+                            Watch Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Hidden Admin Access -->
+    <div class="hidden-admin" onclick="showAdminLogin()">
+        Admin
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div class="admin-modal" id="adminModal">
+        <div class="admin-login-box">
+            <div class="admin-logo">MovieLife Admin</div>
+            <input type="password" class="admin-input" id="adminPassword" placeholder="Enter admin password">
+            <button class="admin-btn" onclick="checkAdminPassword()">Access Admin Panel</button>
+            <div id="adminError" style="color:var(--netflix-red);margin-top:10px;display:none;">
+                Incorrect password!
+            </div>
+        </div>
+        <div class="close-admin" onclick="hideAdminLogin()">×</div>
+    </div>
+
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 100) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Admin login functions
+        function showAdminLogin() {
+            document.getElementById('adminModal').style.display = 'flex';
+            document.getElementById('adminPassword').focus();
+        }
+
+        function hideAdminLogin() {
+            document.getElementById('adminModal').style.display = 'none';
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('adminError').style.display = 'none';
+        }
+
+        function checkAdminPassword() {
+            const password = document.getElementById('adminPassword').value;
+            const errorElement = document.getElementById('adminError');
+            
+            if (password === 'sheikh232011+') {
+                // ✅ REDIRECT TO ADMIN DASHBOARD
+                window.location.href = 'admin/dashboard.html';
+            } else {
+                errorElement.style.display = 'block';
+                document.getElementById('adminPassword').value = '';
+            }
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('adminModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideAdminLogin();
+            }
+        });
+
+        // Enter key support for admin login
+        document.getElementById('adminPassword').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkAdminPassword();
+            }
+        });
+    </script>
+</body>
+</html>
